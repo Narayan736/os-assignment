@@ -1,0 +1,73 @@
+#include <iostream>
+using namespace std;
+
+void finding_waiting_time(int processesId[], int n, int burstTime[], int waitingTime[], int quantumTime)
+{
+    int remainingBurstTime[n];
+    for (int i = 0; i < n; i++)
+        remainingBurstTime[i] = burstTime[i];
+
+    int t = 0; 
+    while (1)
+    {
+        bool isCompleted = true;
+        for (int i = 0; i < n; i++)
+        {
+            if (remainingBurstTime[i] > 0)
+            {
+                isCompleted = false; 
+
+                if (remainingBurstTime[i] > quantumTime)
+                {
+                    t += quantumTime;
+                    remainingBurstTime[i] -= quantumTime;
+                }
+                else
+                {
+                    t = t + remainingBurstTime[i];
+                    waitingTime[i] = t - burstTime[i];
+                    remainingBurstTime[i] = 0;
+                }
+            }
+        }
+        if (isCompleted == true)
+            break;
+    }
+}
+
+void finding_turn_around_time(int processesId[], int n, int burstTime[], int waitingTime[], int tat[])
+{
+    for (int i = 0; i < n; i++)
+        tat[i] = burstTime[i] + waitingTime[i];
+}
+
+void finding_average_time(int processesId[], int n, int burstTime[], int quantumTime)
+{
+    int waitingTime[n], tat[n], total_wt = 0, total_tat = 0;
+
+    finding_waiting_time(processesId, n, burstTime, waitingTime, quantumTime);
+    finding_turn_around_time(processesId, n, burstTime, waitingTime, tat);
+    cout << "Processes " << " Burst time " << " Waiting time " << " Turn around time\n";
+ 
+    for (int i = 0; i < n; i++)
+    {
+        total_wt = total_wt + waitingTime[i];
+        total_tat = total_tat + tat[i];
+        cout << " " << i + 1 << "\t\t" << burstTime[i] << "\t " << waitingTime[i] << "\t\t " << tat[i] << endl;
+    }
+
+    cout << "Average waiting time = " << (float)total_wt / (float)n;
+    cout << "\nAverage turn around time = " << (float)total_tat / (float)n;
+}
+
+int main()
+{
+    int processesId[] = {1, 2, 3};
+    int n = sizeof processesId / sizeof processesId[0];
+    int burst_time_of_processes[] = {12, 4, 7};
+
+    int quantumTime = 2;
+    finding_average_time(processesId, n, burst_time_of_processes, quantumTime);
+    return 0;
+}
+
